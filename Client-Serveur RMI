@@ -1,0 +1,60 @@
+### Serveur RMI :
+
+import java.rmi.*;
+import java.rmi.registry.*;
+
+public class ServeurRMI extends java.rmi.server.UnicastRemoteObject implements IService {
+
+    public ServeurRMI() throws RemoteException {
+        super();
+    }
+
+    public String convertToUpper(String input) throws RemoteException {
+        return input.toUpperCase();
+    }
+
+    public static void main(String[] args) {
+        try {
+            // Création d'une instance du serveur RMI
+            ServeurRMI server = new ServeurRMI();
+
+            // Création et démarrage du registre RMI sur le port 1099
+            Registry registry = LocateRegistry.createRegistry(1099);
+
+            // Enregistrement du serveur dans le registre RMI avec le nom "Service"
+            registry.rebind("Service", server);
+
+            System.out.println("Serveur RMI démarré.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+### Interface de Service RMI :
+
+import java.rmi.*;
+
+public interface IService extends Remote {
+    public String convertToUpper(String input) throws RemoteException;
+}
+
+### Client RMI :
+
+import java.rmi.*;
+
+public class ClientRMI {
+    public static void main(String[] args) {
+        try {
+            // Recherche du serveur dans le registre RMI
+            IService service = (IService) Naming.lookup("//localhost/Service");
+
+            // Appel à la méthode distante
+            String result = service.convertToUpper("hello");
+
+            System.out.println("Résultat de la conversion : " + result);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
